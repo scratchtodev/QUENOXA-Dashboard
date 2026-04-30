@@ -20,7 +20,7 @@ if SUPABASE_URL and SUPABASE_KEY and SUPABASE_URL.startswith("http"):
         print(f"Warning: Failed to initialize Supabase: {e}")
         supabase = None
 
-app = FastAPI(title="Nexus Dashboard API", description="API for Client and Student Tracking Systems")
+app = FastAPI(title="QUENOXA Dashboard API", description="API for Client and Student Tracking Systems")
 
 # Configure CORS for frontend
 app.add_middleware(
@@ -33,11 +33,21 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to Nexus Dashboard API", "supabase_connected": supabase is not None}
+    return {"message": "Welcome to QUENOXA Dashboard API", "supabase_connected": supabase is not None}
 
 @app.get("/api/health")
 def health_check():
     return {"status": "healthy"}
+
+# --- Members (Admins/Staff) Routes ---
+@app.get("/api/members")
+def get_members():
+    # Mock data for members and their task counts
+    return [
+        {"id": "m1", "name": "Admin User", "email": "admin@quenoxa.com", "role": "Administrator", "tasks": {"total": 12, "completed": 8, "remaining": 4}},
+        {"id": "m2", "name": "Alice Walker", "email": "alice@quenoxa.com", "role": "Mentor", "tasks": {"total": 5, "completed": 5, "remaining": 0}},
+        {"id": "m3", "name": "Bob Harris", "email": "bob@quenoxa.com", "role": "Staff", "tasks": {"total": 8, "completed": 2, "remaining": 6}}
+    ]
 
 # --- Client Tracking System Routes ---
 @app.get("/api/clients")
@@ -73,14 +83,64 @@ def create_student(student_data: dict):
     response = supabase.table("students").insert(student_data).execute()
     return response.data
 
+# --- Tasks Routes ---
+@app.get("/api/tasks")
+def get_tasks():
+    if not supabase:
+        return [
+            {"id": "1", "title": "Design Mockups", "status": "Completed", "deadline": "2023-12-01"},
+            {"id": "2", "title": "API Integration", "status": "Pending", "deadline": "2024-01-15"}
+        ]
+        
+    response = supabase.table("tasks").select("*").execute()
+    return response.data
+
+# --- Document Generation Routes ---
+@app.post("/api/tasks")
+def create_task(task_data: dict):
+    if not supabase:
+        return {"message": "Mock Task created"}
+    response = supabase.table("tasks").insert(task_data).execute()
+    return response.data
+
+# --- Projects Routes ---
+@app.get("/api/projects")
+def get_projects():
+    if not supabase:
+        return [{"id": "1", "name": "Website Redesign (Mock)", "status": "Ongoing"}]
+    response = supabase.table("projects").select("*").execute()
+    return response.data
+
+@app.post("/api/projects")
+def create_project(project_data: dict):
+    if not supabase:
+        return {"message": "Mock Project created"}
+    response = supabase.table("projects").insert(project_data).execute()
+    return response.data
+
+# --- Evaluations Routes ---
+@app.get("/api/evaluations")
+def get_evaluations():
+    if not supabase:
+        return [{"id": "1", "score": 95, "feedback": "Excellent work! (Mock)"}]
+    response = supabase.table("evaluations").select("*").execute()
+    return response.data
+
+@app.post("/api/evaluations")
+def create_evaluation(eval_data: dict):
+    if not supabase:
+        return {"message": "Mock Evaluation created"}
+    response = supabase.table("evaluations").insert(eval_data).execute()
+    return response.data
+
 # --- Document Generation Routes ---
 @app.post("/api/reports/generate")
-def generate_report():
+def generate_report(data: dict = None):
     # Placeholder for reportlab / python-docx logic
-    return {"message": "Report generation triggered.", "url": "/mock-report.pdf"}
+    return {"message": "Report generation triggered successfully.", "url": "#"}
 
 @app.post("/api/certificates/generate")
-def generate_certificate():
+def generate_certificate(data: dict = None):
     # Placeholder for certificate generation
-    return {"message": "Certificate generation triggered.", "url": "/mock-certificate.pdf"}
+    return {"message": "Certificate generation triggered successfully.", "url": "#"}
 

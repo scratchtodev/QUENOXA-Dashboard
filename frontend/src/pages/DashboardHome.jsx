@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, FileText, CheckCircle, Briefcase } from 'lucide-react';
 import { fetchClients, fetchStudents } from '../api';
+import { useNavigate } from 'react-router-dom';
 
 export default function DashboardHome() {
   const [stats, setStats] = useState({
@@ -9,6 +10,8 @@ export default function DashboardHome() {
     pendingEvals: 8, // mock for now
     completedTasks: 124 // mock for now
   });
+  
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadStats() {
@@ -34,7 +37,7 @@ export default function DashboardHome() {
     <div className="page-container">
       <div style={{ marginBottom: '24px' }}>
         <h1>Dashboard Home</h1>
-        <p style={{ color: 'var(--on-surface-variant)' }}>Welcome to Nexus Dashboard. Here is your overview.</p>
+        <p style={{ color: 'var(--on-surface-variant)' }}>Welcome to QUENOXA Dashboard. Here is your overview.</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginBottom: '32px' }}>
@@ -92,9 +95,9 @@ export default function DashboardHome() {
         <div className="card">
           <h2 style={{ fontSize: '18px', marginBottom: '16px' }}>Quick Actions</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <button className="btn btn-secondary">Assign New Task</button>
-            <button className="btn btn-secondary">Generate Invoice</button>
-            <a href="/students" className="btn btn-secondary" style={{ textAlign: 'center', textDecoration: 'none' }}>Add New Student</a>
+            <button className="btn btn-secondary" onClick={() => navigate('/tasks')}>Assign New Task</button>
+            <button className="btn btn-secondary" onClick={() => navigate('/reports')}>Generate Invoice</button>
+            <button className="btn btn-secondary" onClick={() => navigate('/students')}>Add New Student</button>
           </div>
         </div>
       </div>

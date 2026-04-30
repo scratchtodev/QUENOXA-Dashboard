@@ -55,7 +55,7 @@ export default function Login() {
           }}>
             <Lock size={24} />
           </div>
-          <h1 style={{ fontSize: '24px', marginBottom: '8px' }}>Nexus Dashboard</h1>
+          <h1 style={{ fontSize: '24px', marginBottom: '8px' }}>QUENOXA Dashboard</h1>
           <p style={{ color: 'var(--on-surface-variant)', fontSize: '14px' }}>Sign in to access the admin panel</p>
         </div>
 

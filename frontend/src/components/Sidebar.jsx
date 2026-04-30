@@ -1,11 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, UserSquare2, CheckSquare, FolderGit2, Star, FileText, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, UserSquare2, CheckSquare, FolderGit2, Star, FileText, Settings, UserCog } from 'lucide-react';
 
 export default function Sidebar() {
   const location = useLocation();
 
   const navItems = [
     { name: 'Dashboard', path: '/', icon: LayoutDashboard },
+    { name: 'Members', path: '/members', icon: UserCog },
     { name: 'Clients', path: '/clients', icon: Users },
     { name: 'Students', path: '/students', icon: UserSquare2 },
     { name: 'Projects', path: '/projects', icon: FolderGit2 },
@@ -17,8 +18,19 @@ export default function Sidebar() {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-header">
-        <h2>Nexus</h2>
+      <div className="sidebar-header" style={{ display: 'flex', alignItems: 'center', height: '80px' }}>
+        <img 
+          src="/logo.png" 
+          alt="QUENOXA Logo" 
+          style={{ height: '32px', maxWidth: '100%', objectFit: 'contain' }} 
+          onError={(e) => {
+            e.target.style.display = 'none';
+            document.getElementById('fallback-logo-text').style.display = 'block';
+          }}
+        />
+        <h2 id="fallback-logo-text" style={{ display: 'none', margin: 0, color: 'var(--primary)', letterSpacing: '2px', fontWeight: '800' }}>
+          QUENOXA
+        </h2>
       </div>
       <nav className="sidebar-nav">
         {navItems.map((item) => {
