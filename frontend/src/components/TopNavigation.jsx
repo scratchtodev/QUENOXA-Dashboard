@@ -1,6 +1,14 @@
-import { Bell, Search, User } from 'lucide-react';
+import { Bell, Search, User, LogOut } from 'lucide-react';
+import { supabase } from '../supabaseClient';
+import { useAuth } from '../context/AuthContext';
 
 export default function TopNavigation() {
+  const { user } = useAuth();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
   return (
     <header style={{
       display: 'flex',
@@ -32,7 +40,7 @@ export default function TopNavigation() {
         <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--on-surface-variant)' }}>
           <Bell size={20} />
         </button>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
             width: '32px',
             height: '32px',
@@ -46,7 +54,18 @@ export default function TopNavigation() {
           }}>
             <User size={18} />
           </div>
-          <span style={{ fontSize: '14px', fontWeight: '500' }}>Admin User</span>
+          <span style={{ fontSize: '14px', fontWeight: '500' }}>{user?.email || 'Admin'}</span>
+          <button 
+            onClick={handleLogout}
+            style={{ 
+              background: 'none', border: 'none', cursor: 'pointer', 
+              color: 'var(--on-surface-variant)', marginLeft: '8px',
+              display: 'flex', alignItems: 'center'
+            }}
+            title="Logout"
+          >
+            <LogOut size={18} />
+          </button>
         </div>
       </div>
     </header>

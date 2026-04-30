@@ -1,0 +1,14 @@
+# Environment variables (KEEP SECRETS SAFE)
+.env
+backend/.env
+frontend/.env
+
+# Node/Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.npm/
+
+# Python/Backend
+backend/.venv/
+backend/__pycache__/
+*.pyc

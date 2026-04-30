@@ -1,7 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, FileText, CheckCircle, Briefcase } from 'lucide-react';
+import { fetchClients, fetchStudents } from '../api';
 
 export default function DashboardHome() {
+  const [stats, setStats] = useState({
+    activeClients: 0,
+    activeStudents: 0,
+    pendingEvals: 8, // mock for now
+    completedTasks: 124 // mock for now
+  });
+
+  useEffect(() => {
+    async function loadStats() {
+      try {
+        const [clients, students] = await Promise.all([
+          fetchClients(),
+          fetchStudents()
+        ]);
+        
+        setStats(prev => ({
+          ...prev,
+          activeClients: clients.length,
+          activeStudents: students.filter(s => s.status === 'Active' || s.status === 'active').length || students.length
+        }));
+      } catch (error) {
+        console.error("Failed to load dashboard stats", error);
+      }
+    }
+    loadStats();
+  }, []);
+
   return (
     <div className="page-container">
       <div style={{ marginBottom: '24px' }}>
@@ -15,8 +43,8 @@ export default function DashboardHome() {
             <Briefcase size={24} />
           </div>
           <div>
-            <h3 style={{ color: 'var(--on-surface-variant)', fontSize: '14px', marginBottom: '4px' }}>Active Projects</h3>
-            <p style={{ fontSize: '28px', fontWeight: '700', color: 'var(--on-surface)' }}>12</p>
+            <h3 style={{ color: 'var(--on-surface-variant)', fontSize: '14px', marginBottom: '4px' }}>Active Clients</h3>
+            <p style={{ fontSize: '28px', fontWeight: '700', color: 'var(--on-surface)' }}>{stats.activeClients}</p>
           </div>
         </div>
 
@@ -26,7 +54,7 @@ export default function DashboardHome() {
           </div>
           <div>
             <h3 style={{ color: 'var(--on-surface-variant)', fontSize: '14px', marginBottom: '4px' }}>Active Students</h3>
-            <p style={{ fontSize: '28px', fontWeight: '700', color: 'var(--on-surface)' }}>45</p>
+            <p style={{ fontSize: '28px', fontWeight: '700', color: 'var(--on-surface)' }}>{stats.activeStudents}</p>
           </div>
         </div>
 
@@ -36,7 +64,7 @@ export default function DashboardHome() {
           </div>
           <div>
             <h3 style={{ color: 'var(--on-surface-variant)', fontSize: '14px', marginBottom: '4px' }}>Pending Evaluations</h3>
-            <p style={{ fontSize: '28px', fontWeight: '700', color: 'var(--on-surface)' }}>8</p>
+            <p style={{ fontSize: '28px', fontWeight: '700', color: 'var(--on-surface)' }}>{stats.pendingEvals}</p>
           </div>
         </div>
         
@@ -46,7 +74,7 @@ export default function DashboardHome() {
           </div>
           <div>
             <h3 style={{ color: 'var(--on-surface-variant)', fontSize: '14px', marginBottom: '4px' }}>Completed Tasks</h3>
-            <p style={{ fontSize: '28px', fontWeight: '700', color: 'var(--on-surface)' }}>124</p>
+            <p style={{ fontSize: '28px', fontWeight: '700', color: 'var(--on-surface)' }}>{stats.completedTasks}</p>
           </div>
         </div>
       </div>
@@ -66,7 +94,7 @@ export default function DashboardHome() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <button className="btn btn-secondary">Assign New Task</button>
             <button className="btn btn-secondary">Generate Invoice</button>
-            <button className="btn btn-secondary">Add New Student</button>
+            <a href="/students" className="btn btn-secondary" style={{ textAlign: 'center', textDecoration: 'none' }}>Add New Student</a>
           </div>
         </div>
       </div>

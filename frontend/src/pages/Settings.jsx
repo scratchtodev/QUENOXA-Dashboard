@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette, Key, LogOut } from 'lucide-react';
+import { Palette, Key, LogOut, UserPlus } from 'lucide-react';
 
 export default function Settings() {
   return (
@@ -26,6 +26,24 @@ export default function Settings() {
         </h3>
         <p style={{ color: 'var(--on-surface-variant)', marginBottom: '16px' }}>Manage 2FA and connected accounts.</p>
         <button className="btn btn-secondary">Enable Google Authenticator (TOTP)</button>
+      </div>
+
+      <div className="card">
+        <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+          <UserPlus size={20} /> User Management
+        </h3>
+        <p style={{ color: 'var(--on-surface-variant)', marginBottom: '16px' }}>
+          Invite new members to the Dashboard. Copy this link and send it to them so they can securely register their account.
+        </p>
+        <button 
+          className="btn btn-primary"
+          onClick={() => {
+            navigator.clipboard.writeText(window.location.origin + '/register');
+            alert("Invite link copied to clipboard!");
+          }}
+        >
+          Copy Invite Link
+        </button>
       </div>
 
       <div className="card" style={{ borderColor: 'var(--error-container)', backgroundColor: '#fffcfc' }}>
