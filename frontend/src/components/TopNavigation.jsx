@@ -1,13 +1,21 @@
-import { Bell, Search, User, LogOut } from 'lucide-react';
+import { Bell, Search, User, LogOut, Globe } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function TopNavigation() {
   const { user } = useAuth();
+  const { i18n } = useTranslation();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+  };
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'en' ? 'ta' : 'en';
+    i18n.changeLanguage(newLang);
+    localStorage.setItem('quenoxa-lang', newLang);
   };
 
   return (
@@ -39,6 +47,21 @@ export default function TopNavigation() {
         />
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+        {/* Language Toggle */}
+        <button 
+          onClick={toggleLanguage}
+          style={{ 
+            background: 'none', border: '1px solid var(--outline-variant)', cursor: 'pointer', 
+            color: 'var(--on-surface-variant)', display: 'flex', alignItems: 'center', gap: '6px',
+            padding: '6px 12px', borderRadius: 'var(--radius-md)', fontSize: '13px', fontWeight: '500',
+            transition: 'all 0.2s'
+          }}
+          title="Toggle Language"
+        >
+          <Globe size={16} />
+          {i18n.language === 'en' ? 'EN' : 'தமிழ்'}
+        </button>
+
         <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--on-surface-variant)' }}>
           <Bell size={20} />
         </button>

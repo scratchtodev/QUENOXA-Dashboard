@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, MoreVertical, X } from 'lucide-react';
 import { fetchClients, createClient } from '../api';
+import { useTranslation } from 'react-i18next';
+import { exportToExcel, exportToPDF } from '../utils/exportUtils';
 
 export default function Clients() {
+  const { t } = useTranslation();
   const [clients, setClients] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', contact: '', email: '', status: 'Active' });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
-  useEffect(() => {
-    loadClients();
-  }, []);
+  useEffect(() => { loadClients(); }, []);
 
   const loadClients = async () => {
     try {
@@ -26,11 +30,29 @@ export default function Clients() {
       await createClient(formData);
       setIsModalOpen(false);
       setFormData({ name: '', contact: '', email: '', status: 'Active' });
-      loadClients(); // Refresh the table
+      loadClients();
     } catch (error) {
       console.error("Failed to save client:", error);
     }
   };
+
+  const filtered = clients.filter(c => {
+    const matchSearch = searchTerm === '' ||
+      c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (c.id || '').toString().toLowerCase().includes(searchTerm.toLowerCase());
+    const matchStatus = statusFilter === 'All' || (c.status || '').toLowerCase() === statusFilter.toLowerCase();
+    return matchSearch && matchStatus;
+  });
+
+  const selectStyle = { padding: '8px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--outline-variant)', backgroundColor: 'var(--surface)', color: 'var(--on-surface)', fontSize: '14px' };
+
+  const exportColumns = [
+    { header: 'Client ID', dataKey: 'id' },
+    { header: 'Company', dataKey: 'name' },
+    { header: 'Email', dataKey: 'email' },
+    { header: 'Status', dataKey: 'status' },
+  ];
 
   return (
     <div className="page-container">
@@ -39,27 +61,43 @@ export default function Clients() {
           <h1>Client Management</h1>
           <p style={{ color: 'var(--on-surface-variant)' }}>Manage organizations and tracking details</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
-          <Plus size={18} style={{ marginRight: '8px' }} />
-          Add Client
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ position: 'relative' }}>
+            <button className="btn btn-secondary" onClick={() => setShowExportMenu(!showExportMenu)} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {t('buttons.export')} ▾
+            </button>
+            {showExportMenu && (
+              <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: '4px', backgroundColor: 'var(--surface)', border: '1px solid var(--outline-variant)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 20, overflow: 'hidden' }}>
+                <button onClick={() => { exportToExcel(filtered, exportColumns, 'QUENOXA_Clients'); setShowExportMenu(false); }} style={{ display: 'block', width: '100%', padding: '10px 20px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', color: 'var(--on-surface)', fontSize: '14px' }}>{t('buttons.excel')}</button>
+                <button onClick={() => { exportToPDF(filtered, exportColumns, 'Client Directory', 'QUENOXA_Clients'); setShowExportMenu(false); }} style={{ display: 'block', width: '100%', padding: '10px 20px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', color: 'var(--on-surface)', fontSize: '14px' }}>{t('buttons.pdf')}</button>
+              </div>
+            )}
+          </div>
+          <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
+            <Plus size={18} style={{ marginRight: '8px' }} />
+            Add Client
+          </button>
+        </div>
+      </div>
+
+      {/* Search & Filter Bar */}
+      <div className="card" style={{ marginBottom: '16px', display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ position: 'relative', flexGrow: 1, minWidth: '200px' }}>
+          <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--outline)' }} />
+          <input type="text" placeholder={t('filters.searchClients')} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ width: '100%', padding: '8px 16px 8px 36px', borderRadius: 'var(--radius-md)', border: '1px solid var(--outline-variant)', backgroundColor: 'var(--surface)', color: 'var(--on-surface)' }} />
+        </div>
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={selectStyle}>
+          <option value="All">{t('filters.allStatuses')}</option>
+          <option value="Active">{t('status.active')}</option>
+          <option value="Pending">{t('status.pending')}</option>
+          <option value="Inactive">{t('status.inactive')}</option>
+        </select>
+        <button className="btn btn-secondary" onClick={() => { setSearchTerm(''); setStatusFilter('All'); }} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <X size={16} /> {t('buttons.clearFilters')}
         </button>
       </div>
 
       <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-          <div style={{ position: 'relative', width: '300px' }}>
-            <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--outline)' }} />
-            <input 
-              type="text" 
-              placeholder="Search clients..." 
-              style={{
-                width: '100%', padding: '8px 16px 8px 36px', borderRadius: 'var(--radius-md)',
-                border: '1px solid #E5E7EB', backgroundColor: 'var(--surface-container-lowest)'
-              }}
-            />
-          </div>
-        </div>
-
         <div style={{ overflowX: 'auto' }}>
           <table className="data-table">
             <thead>
@@ -73,7 +111,7 @@ export default function Clients() {
               </tr>
             </thead>
             <tbody>
-              {clients.map(client => (
+              {filtered.map(client => (
                 <tr key={client.id}>
                   <td className="mono">CLT-{(client.id || '').toString().padStart(3, '0')}</td>
                   <td style={{ fontWeight: 500 }}>{client.name}</td>
@@ -92,7 +130,7 @@ export default function Clients() {
                   </td>
                 </tr>
               ))}
-              {clients.length === 0 && (
+              {filtered.length === 0 && (
                 <tr>
                   <td colSpan="6" style={{ textAlign: 'center', padding: '32px', color: 'var(--on-surface-variant)' }}>
                     No clients found. Click "Add Client" to get started.

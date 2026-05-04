@@ -20,6 +20,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Members from './pages/Members';
+import ActivityLog from './pages/ActivityLog';
 
 // Student Pages
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -95,6 +96,7 @@ function App() {
           <Route path="/evaluations" element={<ProtectedRoute allowedRoles={['admin']} layoutType="admin"><Evaluations /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute allowedRoles={['admin']} layoutType="admin"><Reports /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute allowedRoles={['admin']} layoutType="admin"><Settings /></ProtectedRoute>} />
+          <Route path="/activity-log" element={<ProtectedRoute allowedRoles={['admin']} layoutType="admin"><ActivityLog /></ProtectedRoute>} />
 
           {/* Student Routes */}
           <Route path="/student" element={<ProtectedRoute allowedRoles={['student']} layoutType="student"><StudentDashboard /></ProtectedRoute>} />

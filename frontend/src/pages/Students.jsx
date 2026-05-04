@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, MoreVertical, X } from 'lucide-react';
+import { Search, Plus, MoreVertical, X, Download } from 'lucide-react';
 import { fetchStudents, createStudent } from '../api';
+import { useTranslation } from 'react-i18next';
+import { exportToExcel, exportToPDF } from '../utils/exportUtils';
 
 export default function Students() {
+  const { t } = useTranslation();
   const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', university: '', major: '', status: 'Active' });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
-  useEffect(() => {
-    loadStudents();
-  }, []);
+  useEffect(() => { loadStudents(); }, []);
 
   const loadStudents = async () => {
     try {
@@ -26,11 +30,30 @@ export default function Students() {
       await createStudent(formData);
       setIsModalOpen(false);
       setFormData({ name: '', university: '', major: '', status: 'Active' });
-      loadStudents(); // Refresh the table
+      loadStudents();
     } catch (error) {
       console.error("Failed to save student:", error);
     }
   };
+
+  const filtered = students.filter(s => {
+    const matchSearch = searchTerm === '' || 
+      s.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (s.id || '').toString().toLowerCase().includes(searchTerm.toLowerCase());
+    const matchStatus = statusFilter === 'All' || (s.status || '').toLowerCase() === statusFilter.toLowerCase();
+    return matchSearch && matchStatus;
+  });
+
+  const selectStyle = { padding: '8px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--outline-variant)', backgroundColor: 'var(--surface)', color: 'var(--on-surface)', fontSize: '14px' };
+
+  const exportColumns = [
+    { header: 'Student ID', dataKey: 'id' },
+    { header: 'Name', dataKey: 'name' },
+    { header: 'University', dataKey: 'university' },
+    { header: 'Major', dataKey: 'major' },
+    { header: 'Status', dataKey: 'status' },
+  ];
 
   return (
     <div className="page-container">
@@ -39,9 +62,39 @@ export default function Students() {
           <h1>Student Internship Tracking</h1>
           <p style={{ color: 'var(--on-surface-variant)' }}>Manage interns, tasks, and progress</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
-          <Plus size={18} style={{ marginRight: '8px' }} />
-          Add Student
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ position: 'relative' }}>
+            <button className="btn btn-secondary" onClick={() => setShowExportMenu(!showExportMenu)} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {t('buttons.export')} ▾
+            </button>
+            {showExportMenu && (
+              <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: '4px', backgroundColor: 'var(--surface)', border: '1px solid var(--outline-variant)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 20, overflow: 'hidden' }}>
+                <button onClick={() => { exportToExcel(filtered, exportColumns, 'QUENOXA_Students'); setShowExportMenu(false); }} style={{ display: 'block', width: '100%', padding: '10px 20px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', color: 'var(--on-surface)', fontSize: '14px' }}>{t('buttons.excel')}</button>
+                <button onClick={() => { exportToPDF(filtered, exportColumns, 'Student Directory', 'QUENOXA_Students'); setShowExportMenu(false); }} style={{ display: 'block', width: '100%', padding: '10px 20px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', color: 'var(--on-surface)', fontSize: '14px' }}>{t('buttons.pdf')}</button>
+              </div>
+            )}
+          </div>
+          <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
+            <Plus size={18} style={{ marginRight: '8px' }} />
+            Add Student
+          </button>
+        </div>
+      </div>
+
+      {/* Search & Filter Bar */}
+      <div className="card" style={{ marginBottom: '16px', display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ position: 'relative', flexGrow: 1, minWidth: '200px' }}>
+          <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--outline)' }} />
+          <input type="text" placeholder={t('filters.searchStudents')} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ width: '100%', padding: '8px 16px 8px 36px', borderRadius: 'var(--radius-md)', border: '1px solid var(--outline-variant)', backgroundColor: 'var(--surface)', color: 'var(--on-surface)' }} />
+        </div>
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={selectStyle}>
+          <option value="All">{t('filters.allStatuses')}</option>
+          <option value="Active">{t('status.active')}</option>
+          <option value="Completed">{t('status.completed')}</option>
+          <option value="Dropped">{t('status.dropped')}</option>
+        </select>
+        <button className="btn btn-secondary" onClick={() => { setSearchTerm(''); setStatusFilter('All'); }} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <X size={16} /> {t('buttons.clearFilters')}
         </button>
       </div>
 
@@ -58,7 +111,7 @@ export default function Students() {
             </tr>
           </thead>
           <tbody>
-            {students.map(student => (
+            {filtered.map(student => (
               <tr key={student.id}>
                 <td className="mono">STU-{(student.id || '').toString().padStart(3, '0')}</td>
                 <td style={{ fontWeight: 500 }}>{student.name}</td>
@@ -74,7 +127,7 @@ export default function Students() {
                 </td>
               </tr>
             ))}
-            {students.length === 0 && (
+            {filtered.length === 0 && (
               <tr>
                 <td colSpan="6" style={{ textAlign: 'center', padding: '32px', color: 'var(--on-surface-variant)' }}>
                   No students found. Click "Add Student" to get started.
@@ -132,4 +185,3 @@ export default function Students() {
     </div>
   );
 }
-

@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, UserSquare2, CheckSquare, FolderGit2, Star, FileText, Settings, UserCog } from 'lucide-react';
+import { LayoutDashboard, Users, UserSquare2, CheckSquare, FolderGit2, Star, FileText, Settings, UserCog, Activity } from 'lucide-react';
 
 export default function Sidebar() {
   const location = useLocation();
@@ -13,6 +13,7 @@ export default function Sidebar() {
     { name: 'Tasks', path: '/tasks', icon: CheckSquare },
     { name: 'Evaluations', path: '/evaluations', icon: Star },
     { name: 'Reports', path: '/reports', icon: FileText },
+    { name: 'Activity Log', path: '/activity-log', icon: Activity },
     { name: 'Settings', path: '/settings', icon: Settings },
   ];
 

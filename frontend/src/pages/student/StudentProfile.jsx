@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { UserCircle, Save } from 'lucide-react';
+import { supabase } from '../../supabaseClient';
+import { useTranslation } from 'react-i18next';
 
 export default function StudentProfile() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   
   // Editable fields
   const [email, setEmail] = useState(user?.email || '');
@@ -15,11 +18,17 @@ export default function StudentProfile() {
   const handleSave = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    // TODO: Connect to Supabase to update student profile
-    setTimeout(() => {
-      setIsSaving(false);
+    try {
+      await supabase.from('students').update({
+        phone, gender, dob,
+        last_profile_update: new Date().toISOString()
+      }).eq('user_id', user.id);
       alert('Profile updated successfully!');
-    }, 1000);
+    } catch (err) {
+      alert('Save failed: ' + err.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (

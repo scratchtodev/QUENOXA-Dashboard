@@ -46,8 +46,18 @@ export default function Login() {
     }
 
     if (actualRole === 'student') {
+      // Activity logging for students
+      await supabase.from('students').update({ 
+        last_login: new Date().toISOString(), 
+        login_count: (await supabase.from('students').select('login_count').eq('user_id', data.user.id).single()).data?.login_count + 1 || 1
+      }).eq('user_id', data.user.id);
       navigate('/student');
     } else if (actualRole === 'client') {
+      // Activity logging for clients
+      await supabase.from('clients').update({ 
+        last_login: new Date().toISOString(), 
+        login_count: (await supabase.from('clients').select('login_count').eq('user_id', data.user.id).single()).data?.login_count + 1 || 1
+      }).eq('user_id', data.user.id);
       navigate('/client');
     } else {
       navigate('/'); // Admin fallback
