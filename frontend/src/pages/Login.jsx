@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Lock, Mail } from 'lucide-react';
+import { Lock, Mail, Shield, User, Briefcase } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('admin'); // 'admin', 'student', 'client'
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -22,17 +23,34 @@ export default function Login() {
       return;
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (error) {
-      setError(error.message);
+    if (signInError) {
+      setError(signInError.message);
       setLoading(false);
+      return;
+    }
+
+    // Role-based routing and verification
+    const actualRole = data.user?.app_metadata?.role || 'admin';
+    
+    // Enforce that they used the correct portal toggle
+    if (actualRole !== selectedRole) {
+      setError(`Account mismatch. Please use the ${actualRole.charAt(0).toUpperCase() + actualRole.slice(1)} login portal.`);
+      await supabase.auth.signOut(); // Log them out since they used the wrong portal
+      setLoading(false);
+      return;
+    }
+
+    if (actualRole === 'student') {
+      navigate('/student');
+    } else if (actualRole === 'client') {
+      navigate('/client');
     } else {
-      // Successful login
-      navigate('/');
+      navigate('/'); // Admin fallback
     }
   };
 
@@ -43,9 +61,10 @@ export default function Login() {
       justifyContent: 'center',
       minHeight: '100vh',
       backgroundColor: 'var(--surface)',
-      width: '100vw'
+      width: '100vw',
+      padding: '20px'
     }}>
-      <div className="card" style={{ maxWidth: '400px', width: '100%', padding: '40px', boxShadow: '0 20px 40px rgba(0,0,0,0.08)' }}>
+      <div className="card" style={{ maxWidth: '440px', width: '100%', padding: '40px', boxShadow: '0 20px 40px rgba(0,0,0,0.08)' }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div style={{ 
             width: '48px', height: '48px', borderRadius: '12px', 
@@ -55,8 +74,61 @@ export default function Login() {
           }}>
             <Lock size={24} />
           </div>
-          <h1 style={{ fontSize: '24px', marginBottom: '8px' }}>QUENOXA Dashboard</h1>
-          <p style={{ color: 'var(--on-surface-variant)', fontSize: '14px' }}>Sign in to access the admin panel</p>
+          <h1 style={{ fontSize: '24px', marginBottom: '8px' }}>QUENOXA</h1>
+          <p style={{ color: 'var(--on-surface-variant)', fontSize: '14px' }}>Select your portal and sign in</p>
+        </div>
+
+        {/* Role Toggle Tabs */}
+        <div style={{ 
+          display: 'flex', 
+          backgroundColor: 'var(--surface-container-highest)', 
+          padding: '6px', 
+          borderRadius: '12px', 
+          marginBottom: '24px',
+          gap: '4px'
+        }}>
+          <button 
+            type="button"
+            onClick={() => { setSelectedRole('admin'); setError(''); }}
+            style={{
+              flex: 1, padding: '10px 0', border: 'none', borderRadius: '8px',
+              backgroundColor: selectedRole === 'admin' ? 'var(--surface)' : 'transparent',
+              color: selectedRole === 'admin' ? 'var(--primary)' : 'var(--on-surface-variant)',
+              boxShadow: selectedRole === 'admin' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
+              fontWeight: selectedRole === 'admin' ? '600' : '400',
+              cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '14px'
+            }}
+          >
+            <Shield size={16} /> Member
+          </button>
+          <button 
+            type="button"
+            onClick={() => { setSelectedRole('student'); setError(''); }}
+            style={{
+              flex: 1, padding: '10px 0', border: 'none', borderRadius: '8px',
+              backgroundColor: selectedRole === 'student' ? 'var(--surface)' : 'transparent',
+              color: selectedRole === 'student' ? 'var(--primary)' : 'var(--on-surface-variant)',
+              boxShadow: selectedRole === 'student' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
+              fontWeight: selectedRole === 'student' ? '600' : '400',
+              cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '14px'
+            }}
+          >
+            <User size={16} /> Student
+          </button>
+          <button 
+            type="button"
+            onClick={() => { setSelectedRole('client'); setError(''); }}
+            style={{
+              flex: 1, padding: '10px 0', border: 'none', borderRadius: '8px',
+              backgroundColor: selectedRole === 'client' ? 'var(--surface)' : 'transparent',
+              color: selectedRole === 'client' ? 'var(--primary)' : 'var(--on-surface-variant)',
+              boxShadow: selectedRole === 'client' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
+              fontWeight: selectedRole === 'client' ? '600' : '400',
+              cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '14px'
+            }}
+          >
+            <Briefcase size={16} /> Client
+          </button>
         </div>
 
         {error && (
@@ -75,7 +147,7 @@ export default function Login() {
                 required 
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="admin@example.com"
+                placeholder={`${selectedRole}@example.com`}
                 style={{ paddingLeft: '40px' }}
               />
             </div>
@@ -102,7 +174,7 @@ export default function Login() {
             style={{ width: '100%', marginTop: '24px', justifyContent: 'center', padding: '12px' }}
             disabled={loading}
           >
-            {loading ? 'Authenticating...' : 'Sign In'}
+            {loading ? 'Authenticating...' : `Sign In as ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`}
           </button>
         </form>
         
