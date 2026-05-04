@@ -18,10 +18,12 @@ SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 SUPABASE_BASE_URL = SUPABASE_URL.replace("/rest/v1/", "").replace("/rest/v1", "") if SUPABASE_URL else ""
 
 # Initialize Supabase client (anon key for normal queries)
+# The Python client expects the base URL without /rest/v1/
+SUPABASE_CLIENT_URL = SUPABASE_BASE_URL if SUPABASE_BASE_URL else SUPABASE_URL
 supabase: Client = None
-if SUPABASE_URL and SUPABASE_KEY and SUPABASE_URL.startswith("http"):
+if SUPABASE_CLIENT_URL and SUPABASE_KEY and SUPABASE_CLIENT_URL.startswith("http"):
     try:
-        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+        supabase = create_client(SUPABASE_CLIENT_URL, SUPABASE_KEY)
     except Exception as e:
         print(f"Warning: Failed to initialize Supabase: {e}")
         supabase = None
