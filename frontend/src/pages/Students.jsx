@@ -36,11 +36,11 @@ export default function Students() {
           password: formData.password,
           role: 'student',
           name: formData.name,
-          extraData: { university: formData.university, major: formData.major, status: formData.status }
+          extraData: { university: formData.university, status: formData.status }
         });
       } else {
         // Create student record only (no login account)
-        await createStudent({ name: formData.name, university: formData.university, major: formData.major, status: formData.status });
+        await createStudent({ name: formData.name, university: formData.university, status: formData.status });
       }
       setIsModalOpen(false);
       setFormData({ name: '', university: '', major: '', status: 'Active', email: '', password: '', createAccount: true });
