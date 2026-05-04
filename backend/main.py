@@ -54,17 +54,23 @@ class CreatePortalUserRequest(BaseModel):
     extra_data: Optional[dict] = None
 
 @app.post("/api/create-portal-user")
-async def create_portal_user(req: CreatePortalUserRequest):
+def create_portal_user(req: CreatePortalUserRequest):
     if not SUPABASE_SERVICE_ROLE_KEY:
-        raise HTTPException(status_code=500, detail="Service role key not configured. Add SUPABASE_SERVICE_ROLE_KEY to backend .env")
+        raise HTTPException(status_code=500, detail="Service role key not configured")
     
     if req.role not in ['student', 'client']:
         raise HTTPException(status_code=400, detail="Role must be 'student' or 'client'")
 
-    # Step 1: Create the auth user via Supabase Admin API
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"{SUPABASE_BASE_URL}/auth/v1/admin/users",
+    # Build the correct Supabase base URL
+    base_url = SUPABASE_BASE_URL
+    if not base_url:
+        # Fallback: extract from SUPABASE_URL
+        base_url = (SUPABASE_URL or "").split("/rest")[0]
+    
+    try:
+        # Step 1: Create the auth user via Supabase Admin API (sync)
+        response = httpx.post(
+            f"{base_url}/auth/v1/admin/users",
             headers={
                 "apikey": SUPABASE_SERVICE_ROLE_KEY,
                 "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
@@ -76,28 +82,33 @@ async def create_portal_user(req: CreatePortalUserRequest):
                 "email_confirm": True,
                 "app_metadata": {"role": req.role},
                 "user_metadata": {"full_name": req.name}
-            }
+            },
+            timeout=15.0
         )
-    
-    if response.status_code not in [200, 201]:
-        detail = response.json().get("msg", response.text)
-        raise HTTPException(status_code=response.status_code, detail=f"Auth user creation failed: {detail}")
-    
-    new_user = response.json()
-    new_user_id = new_user.get("id")
+        
+        if response.status_code not in [200, 201]:
+            detail = response.json().get("msg", response.text) if response.text else "Unknown auth error"
+            raise HTTPException(status_code=response.status_code, detail=f"Auth failed: {detail}")
+        
+        new_user = response.json()
+        new_user_id = new_user.get("id")
 
-    # Step 2: Create the linked record in the correct table
-    table = "students" if req.role == "student" else "clients"
-    record_data = {"name": req.name, "email": req.email, "user_id": new_user_id, "status": "Active"}
+        # Step 2: Create the linked record in the correct table
+        table = "students" if req.role == "student" else "clients"
+        record_data = {"name": req.name, "email": req.email, "user_id": new_user_id, "status": "Active"}
+        
+        if req.extra_data:
+            record_data.update(req.extra_data)
+        
+        if supabase:
+            supabase.table(table).insert(record_data).execute()
+        
+        return {"message": f"{req.role.capitalize()} account created successfully", "user_id": new_user_id}
     
-    # Merge any extra fields from the form
-    if req.extra_data:
-        record_data.update(req.extra_data)
-    
-    if supabase:
-        supabase.table(table).insert(record_data).execute()
-    
-    return {"message": f"{req.role.capitalize()} account created successfully", "user_id": new_user_id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")
 
 # --- Members (Admins/Staff) Routes ---
 @app.get("/api/members")
