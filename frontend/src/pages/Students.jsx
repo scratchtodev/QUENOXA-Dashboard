@@ -121,19 +121,19 @@ export default function Students() {
             <tr>
               <th>Student ID</th>
               <th>Name</th>
+              <th>Email</th>
               <th>University</th>
-              <th>Major</th>
               <th>Status</th>
               <th style={{ textAlign: 'right' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map(student => (
+            {filtered.map((student, index) => (
               <tr key={student.id}>
-                <td className="mono">STU-{(student.id || '').toString().padStart(3, '0')}</td>
+                <td className="mono" style={{ color: 'var(--primary)', fontWeight: '500' }}>STU-{String(index + 1).padStart(3, '0')}</td>
                 <td style={{ fontWeight: 500 }}>{student.name}</td>
+                <td style={{ fontSize: '13px', color: 'var(--on-surface-variant)' }}>{student.email || 'N/A'}</td>
                 <td>{student.university || 'N/A'}</td>
-                <td>{student.major || 'N/A'}</td>
                 <td>
                   <span className={`badge ${(student.status || 'active').toLowerCase() === 'active' ? 'success' : 'pending'}`}>{student.status || 'Active'}</span>
                 </td>
