@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, MoreVertical, X } from 'lucide-react';
-import { fetchClients, createClient } from '../api';
+import { fetchClients, createClient, createPortalUser } from '../api';
 import { useTranslation } from 'react-i18next';
 import { exportToExcel, exportToPDF } from '../utils/exportUtils';
 
@@ -8,10 +8,11 @@ export default function Clients() {
   const { t } = useTranslation();
   const [clients, setClients] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: '', contact: '', email: '', status: 'Active' });
+  const [formData, setFormData] = useState({ name: '', contact: '', email: '', status: 'Active', password: '', createAccount: true });
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => { loadClients(); }, []);
 
@@ -26,13 +27,27 @@ export default function Clients() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    setSaving(true);
     try {
-      await createClient(formData);
+      if (formData.createAccount && formData.email && formData.password) {
+        await createPortalUser({
+          email: formData.email,
+          password: formData.password,
+          role: 'client',
+          name: formData.name,
+          extraData: { contact: formData.contact, status: formData.status }
+        });
+      } else {
+        await createClient({ name: formData.name, contact: formData.contact, email: formData.email, status: formData.status });
+      }
       setIsModalOpen(false);
-      setFormData({ name: '', contact: '', email: '', status: 'Active' });
+      setFormData({ name: '', contact: '', email: '', status: 'Active', password: '', createAccount: true });
       loadClients();
+      alert('Client created successfully!');
     } catch (error) {
-      console.error("Failed to save client:", error);
+      alert('Error: ' + error.message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -178,9 +193,24 @@ export default function Clients() {
                   <option value="Inactive">Inactive</option>
                 </select>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '32px' }}>
+
+              {/* Portal Account Section */}
+              <div style={{ marginTop: '24px', padding: '16px', backgroundColor: 'var(--surface-container-highest)', borderRadius: '12px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginBottom: formData.createAccount ? '16px' : '0' }}>
+                  <input type="checkbox" checked={formData.createAccount} onChange={e => setFormData({...formData, createAccount: e.target.checked})} style={{ width: '18px', height: '18px', accentColor: 'var(--primary)' }} />
+                  <span style={{ fontWeight: '500' }}>Create Portal Login Account</span>
+                </label>
+                {formData.createAccount && (
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label>Password</label>
+                    <input required type="password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} placeholder="Min 6 characters" minLength={6} />
+                  </div>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
                 <button type="button" className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Save Client</button>
+                <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Creating...' : 'Save Client'}</button>
               </div>
             </form>
           </div>

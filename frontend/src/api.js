@@ -96,3 +96,22 @@ export async function generateDocument(type, data) {
   if (!response.ok) throw new Error('Failed to generate document');
   return response.json();
 }
+
+/**
+ * Create a portal user (student or client) with full auth account.
+ * This calls the backend which uses the service_role key to:
+ * 1. Create the auth user with app_metadata.role set
+ * 2. Create the linked record in students/clients table
+ */
+export async function createPortalUser({ email, password, role, name, extraData = {} }) {
+  const response = await fetch(`${API_URL}/api/create-portal-user`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password, role, name, extra_data: extraData }),
+  });
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(errData.detail || 'Failed to create portal user');
+  }
+  return response.json();
+}

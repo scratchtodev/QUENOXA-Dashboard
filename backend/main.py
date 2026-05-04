@@ -2,16 +2,22 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import Optional
 from supabase import create_client, Client
 from dotenv import load_dotenv
+import httpx
 
 # Load environment variables
 load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
-# Initialize Supabase client
+# Base URL for Supabase Auth Admin API (strip /rest/v1/ if present)
+SUPABASE_BASE_URL = SUPABASE_URL.replace("/rest/v1/", "").replace("/rest/v1", "") if SUPABASE_URL else ""
+
+# Initialize Supabase client (anon key for normal queries)
 supabase: Client = None
 if SUPABASE_URL and SUPABASE_KEY and SUPABASE_URL.startswith("http"):
     try:
@@ -38,6 +44,60 @@ def read_root():
 @app.get("/api/health")
 def health_check():
     return {"status": "healthy"}
+
+# --- Portal User Creation (Admin Only) ---
+class CreatePortalUserRequest(BaseModel):
+    email: str
+    password: str
+    role: str  # 'student' or 'client'
+    name: str
+    extra_data: Optional[dict] = None
+
+@app.post("/api/create-portal-user")
+async def create_portal_user(req: CreatePortalUserRequest):
+    if not SUPABASE_SERVICE_ROLE_KEY:
+        raise HTTPException(status_code=500, detail="Service role key not configured. Add SUPABASE_SERVICE_ROLE_KEY to backend .env")
+    
+    if req.role not in ['student', 'client']:
+        raise HTTPException(status_code=400, detail="Role must be 'student' or 'client'")
+
+    # Step 1: Create the auth user via Supabase Admin API
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{SUPABASE_BASE_URL}/auth/v1/admin/users",
+            headers={
+                "apikey": SUPABASE_SERVICE_ROLE_KEY,
+                "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "email": req.email,
+                "password": req.password,
+                "email_confirm": True,
+                "app_metadata": {"role": req.role},
+                "user_metadata": {"full_name": req.name}
+            }
+        )
+    
+    if response.status_code not in [200, 201]:
+        detail = response.json().get("msg", response.text)
+        raise HTTPException(status_code=response.status_code, detail=f"Auth user creation failed: {detail}")
+    
+    new_user = response.json()
+    new_user_id = new_user.get("id")
+
+    # Step 2: Create the linked record in the correct table
+    table = "students" if req.role == "student" else "clients"
+    record_data = {"name": req.name, "email": req.email, "user_id": new_user_id, "status": "Active"}
+    
+    # Merge any extra fields from the form
+    if req.extra_data:
+        record_data.update(req.extra_data)
+    
+    if supabase:
+        supabase.table(table).insert(record_data).execute()
+    
+    return {"message": f"{req.role.capitalize()} account created successfully", "user_id": new_user_id}
 
 # --- Members (Admins/Staff) Routes ---
 @app.get("/api/members")

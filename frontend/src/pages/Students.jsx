@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, MoreVertical, X, Download } from 'lucide-react';
-import { fetchStudents, createStudent } from '../api';
+import { fetchStudents, createStudent, createPortalUser } from '../api';
 import { useTranslation } from 'react-i18next';
 import { exportToExcel, exportToPDF } from '../utils/exportUtils';
 
@@ -8,10 +8,11 @@ export default function Students() {
   const { t } = useTranslation();
   const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: '', university: '', major: '', status: 'Active' });
+  const [formData, setFormData] = useState({ name: '', university: '', major: '', status: 'Active', email: '', password: '', createAccount: true });
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => { loadStudents(); }, []);
 
@@ -26,13 +27,29 @@ export default function Students() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    setSaving(true);
     try {
-      await createStudent(formData);
+      if (formData.createAccount && formData.email && formData.password) {
+        // Create auth user + linked student record in one call
+        await createPortalUser({
+          email: formData.email,
+          password: formData.password,
+          role: 'student',
+          name: formData.name,
+          extraData: { university: formData.university, major: formData.major, status: formData.status }
+        });
+      } else {
+        // Create student record only (no login account)
+        await createStudent({ name: formData.name, university: formData.university, major: formData.major, status: formData.status });
+      }
       setIsModalOpen(false);
-      setFormData({ name: '', university: '', major: '', status: 'Active' });
+      setFormData({ name: '', university: '', major: '', status: 'Active', email: '', password: '', createAccount: true });
       loadStudents();
+      alert('Student created successfully!');
     } catch (error) {
-      console.error("Failed to save student:", error);
+      alert('Error: ' + error.message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -174,9 +191,30 @@ export default function Students() {
                   <option value="Terminated">Terminated</option>
                 </select>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '32px' }}>
+
+              {/* Portal Account Section */}
+              <div style={{ marginTop: '24px', padding: '16px', backgroundColor: 'var(--surface-container-highest)', borderRadius: '12px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginBottom: formData.createAccount ? '16px' : '0' }}>
+                  <input type="checkbox" checked={formData.createAccount} onChange={e => setFormData({...formData, createAccount: e.target.checked})} style={{ width: '18px', height: '18px', accentColor: 'var(--primary)' }} />
+                  <span style={{ fontWeight: '500' }}>Create Portal Login Account</span>
+                </label>
+                {formData.createAccount && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label>Login Email</label>
+                      <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="student@email.com" />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label>Password</label>
+                      <input required type="password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} placeholder="Min 6 characters" minLength={6} />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
                 <button type="button" className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Save Student</button>
+                <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Creating...' : 'Save Student'}</button>
               </div>
             </form>
           </div>
