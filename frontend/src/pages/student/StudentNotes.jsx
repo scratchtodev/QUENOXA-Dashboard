@@ -33,8 +33,8 @@ export default function StudentNotes() {
 
   const sections = [
     { key: 'internal_remarks', title: t('notes.internalRemarks'), icon: <StickyNote size={24} />, color: 'var(--primary)' },
-    { key: 'follow_up_notes', title: t('notes.followUpNotes'), icon: <MessageSquare size={24} />, color: '#1e40af' },
-    { key: 'status_comments', title: t('notes.statusComments'), icon: <AlertCircle size={24} />, color: '#92400e' },
+    { key: 'follow_up_notes', title: t('notes.followUpNotes'), icon: <MessageSquare size={24} />, color: 'var(--info)' },
+    { key: 'status_comments', title: t('notes.statusComments'), icon: <AlertCircle size={24} />, color: 'var(--warning)' },
   ];
 
   return (

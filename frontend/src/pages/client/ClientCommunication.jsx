@@ -60,8 +60,8 @@ export default function ClientCommunication() {
 
   const sections = [
     { title: t('communication.meetingSummaries'), content: clientData?.meeting_summary, icon: <Calendar size={24} />, color: 'var(--primary)' },
-    { title: t('communication.followUpNotes'), content: clientData?.follow_up_status, icon: <MessageSquare size={24} />, color: '#1e40af' },
-    { title: t('communication.projectRemarks'), content: clientData?.internal_remarks, icon: <Info size={24} />, color: '#92400e' },
+    { title: t('communication.followUpNotes'), content: clientData?.follow_up_status, icon: <MessageSquare size={24} />, color: 'var(--info)' },
+    { title: t('communication.projectRemarks'), content: clientData?.internal_remarks, icon: <Info size={24} />, color: 'var(--warning)' },
   ];
 
   return (

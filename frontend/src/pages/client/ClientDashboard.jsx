@@ -24,7 +24,7 @@ export default function ClientDashboard() {
         </div>
 
         <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ padding: '16px', backgroundColor: '#dcfce7', borderRadius: '12px', color: '#166534' }}>
+          <div style={{ padding: '16px', backgroundColor: 'var(--secondary-container)', borderRadius: '12px', color: 'var(--on-secondary-container)' }}>
             <Clock size={32} />
           </div>
           <div>
@@ -34,7 +34,7 @@ export default function ClientDashboard() {
         </div>
 
         <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ padding: '16px', backgroundColor: '#dbeafe', borderRadius: '12px', color: '#1e40af' }}>
+          <div style={{ padding: '16px', backgroundColor: 'var(--info-container)', borderRadius: '12px', color: 'var(--on-info-container)' }}>
             <CheckCircle size={32} />
           </div>
           <div>
@@ -44,7 +44,7 @@ export default function ClientDashboard() {
         </div>
 
         <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ padding: '16px', backgroundColor: '#fef3c7', borderRadius: '12px', color: '#92400e' }}>
+          <div style={{ padding: '16px', backgroundColor: 'var(--warning-container)', borderRadius: '12px', color: 'var(--on-warning-container)' }}>
             <AlertCircle size={32} />
           </div>
           <div>

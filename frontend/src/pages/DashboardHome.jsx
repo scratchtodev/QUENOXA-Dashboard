@@ -62,7 +62,7 @@ export default function DashboardHome() {
         </div>
 
         <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', backgroundColor: '#fef9c3', color: '#854d0e' }}>
+          <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--warning-container)', color: 'var(--on-warning-container)' }}>
             <FileText size={24} />
           </div>
           <div>
@@ -72,7 +72,7 @@ export default function DashboardHome() {
         </div>
         
         <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', backgroundColor: '#dcfce7', color: '#166534' }}>
+          <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--secondary-container)', color: 'var(--on-secondary-container)' }}>
             <CheckCircle size={24} />
           </div>
           <div>
@@ -86,9 +86,9 @@ export default function DashboardHome() {
         <div className="card">
           <h2 style={{ fontSize: '18px', marginBottom: '16px' }}>Recent Activity</h2>
           <ul style={{ listStyle: 'none' }}>
-            <li style={{ padding: '12px 0', borderBottom: '1px solid #f3f4f6' }}>Alice Walker submitted the mockups for Acme Corp.</li>
-            <li style={{ padding: '12px 0', borderBottom: '1px solid #f3f4f6' }}>Admin evaluated Bob Harris's API Integration.</li>
-            <li style={{ padding: '12px 0', borderBottom: '1px solid #f3f4f6' }}>New client Initech registered.</li>
+            <li style={{ padding: '12px 0', borderBottom: '1px solid var(--outline-variant)' }}>Alice Walker submitted the mockups for Acme Corp.</li>
+            <li style={{ padding: '12px 0', borderBottom: '1px solid var(--outline-variant)' }}>Admin evaluated Bob Harris's API Integration.</li>
+            <li style={{ padding: '12px 0', borderBottom: '1px solid var(--outline-variant)' }}>New client Initech registered.</li>
           </ul>
         </div>
         

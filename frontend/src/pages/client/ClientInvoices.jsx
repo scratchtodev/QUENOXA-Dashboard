@@ -58,7 +58,7 @@ export default function ClientInvoices() {
     switch(status) {
       case 'paid': return <span className="badge success">{t('status.paid')}</span>;
       case 'pending': return <span className="badge pending">{t('status.pending')}</span>;
-      case 'partial': return <span className="badge" style={{ backgroundColor: '#ffedd5', color: '#c2410c' }}>{t('status.partial')}</span>;
+      case 'partial': return <span className="badge" style={{ backgroundColor: 'var(--warning-container)', color: 'var(--on-warning-container)' }}>{t('status.partial')}</span>;
       default: return <span className="badge">{status}</span>;
     }
   };
@@ -140,11 +140,11 @@ export default function ClientInvoices() {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '16px', backgroundColor: 'var(--surface)', borderRadius: '12px' }}>
           <span style={{ color: 'var(--on-surface-variant)', fontSize: '14px' }}>{t('invoices.totalPaid')}</span>
-          <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#166534' }}>₹ {(totalPaid + partialPaid).toLocaleString('en-IN')}</span>
+          <span style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--secondary)' }}>₹ {(totalPaid + partialPaid).toLocaleString('en-IN')}</span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '16px', backgroundColor: 'var(--surface)', borderRadius: '12px', border: outstanding > 0 ? '1px solid var(--error-container)' : 'none' }}>
           <span style={{ color: 'var(--on-surface-variant)', fontSize: '14px' }}>{t('invoices.outstanding')}</span>
-          <span style={{ fontSize: '24px', fontWeight: 'bold', color: outstanding > 0 ? '#b91c1c' : '#166534' }}>₹ {outstanding.toLocaleString('en-IN')}</span>
+          <span style={{ fontSize: '24px', fontWeight: 'bold', color: outstanding > 0 ? 'var(--error)' : 'var(--secondary)' }}>₹ {outstanding.toLocaleString('en-IN')}</span>
         </div>
       </div>
     </div>

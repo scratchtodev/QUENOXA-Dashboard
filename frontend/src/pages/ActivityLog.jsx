@@ -115,14 +115,14 @@ export default function ActivityLog() {
                   <div style={{ fontSize: '12px', color: 'var(--on-surface-variant)' }}>{user.email || ''}</div>
                 </td>
                 <td>
-                  <span className="badge" style={{ backgroundColor: user.role === 'Student' ? '#dbeafe' : '#fce7f3', color: user.role === 'Student' ? '#1e40af' : '#9d174d' }}>
+                  <span className="badge" style={{ backgroundColor: user.role === 'Student' ? 'var(--info-container)' : 'rgba(255,100,200,0.12)', color: user.role === 'Student' ? 'var(--on-info-container)' : '#ff69b4' }}>
                     {user.role}
                   </span>
                 </td>
                 <td style={{ fontSize: '14px' }}>{formatDate(user.last_login)}</td>
                 <td style={{ fontWeight: '600' }}>{user.login_count || 0}</td>
                 <td>
-                  <span className={`badge ${(user.status || 'active').toLowerCase() === 'active' ? 'success' : (user.status || '').toLowerCase() === 'inactive' ? '' : 'pending'}`} style={(user.status || '').toLowerCase() === 'inactive' ? { backgroundColor: '#e5e7eb', color: '#6b7280' } : {}}>
+                  <span className={`badge ${(user.status || 'active').toLowerCase() === 'active' ? 'success' : (user.status || '').toLowerCase() === 'inactive' ? '' : 'pending'}`} style={(user.status || '').toLowerCase() === 'inactive' ? { backgroundColor: 'rgba(156,163,175,0.15)', color: 'var(--darkgray-100)' } : {}}>
                     {user.status || 'Active'}
                   </span>
                 </td>

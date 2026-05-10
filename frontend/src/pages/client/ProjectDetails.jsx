@@ -75,7 +75,7 @@ export default function ProjectDetails() {
   const getStatusBadge = (status) => {
     const s = status?.toLowerCase();
     if (s === 'active' || s === 'ongoing') return <span className="badge success">{t('status.active')}</span>;
-    if (s === 'completed') return <span className="badge" style={{ backgroundColor: '#dbeafe', color: '#1e40af' }}>{t('status.completed')}</span>;
+    if (s === 'completed') return <span className="badge" style={{ backgroundColor: 'var(--info-container)', color: 'var(--on-info-container)' }}>{t('status.completed')}</span>;
     if (s === 'on hold' || s === 'pending') return <span className="badge pending">{t('status.onHold')}</span>;
     if (s === 'cancelled') return <span className="badge error">{t('status.cancelled')}</span>;
     return <span className="badge">{status}</span>;
@@ -85,7 +85,7 @@ export default function ProjectDetails() {
     switch(status) {
       case 'paid': return <span className="badge success">{t('status.paid')}</span>;
       case 'pending': return <span className="badge pending">{t('status.pending')}</span>;
-      case 'partial': return <span className="badge" style={{ backgroundColor: '#ffedd5', color: '#c2410c' }}>{t('status.partial')}</span>;
+      case 'partial': return <span className="badge" style={{ backgroundColor: 'var(--warning-container)', color: 'var(--on-warning-container)' }}>{t('status.partial')}</span>;
       default: return <span className="badge">{status || 'N/A'}</span>;
     }
   };

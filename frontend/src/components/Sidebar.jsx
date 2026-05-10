@@ -45,10 +45,10 @@ export default function Sidebar() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
-                backgroundColor: isActive ? '#374151' : 'transparent',
+                backgroundColor: isActive ? 'var(--sidebar-hover)' : 'transparent',
                 borderLeft: isActive ? '4px solid var(--primary)' : '4px solid transparent',
                 paddingLeft: isActive ? '20px' : '24px',
-                color: isActive ? '#F9FAFB' : '#D1D5DB'
+                color: isActive ? 'var(--sidebar-active-text)' : 'var(--sidebar-link)'
               }}
             >
               <Icon size={20} />

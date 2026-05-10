@@ -69,7 +69,7 @@ export default function Profile() {
         <div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
             <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px' }}>
-              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: '#e0e7ff', color: '#4338ca' }}>
+              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--info-container)', color: 'var(--on-info-container)' }}>
                 <ListTodo size={20} />
               </div>
               <div>
@@ -79,7 +79,7 @@ export default function Profile() {
             </div>
             
             <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px' }}>
-              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: '#dcfce7', color: '#166534' }}>
+              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--secondary-container)', color: 'var(--on-secondary-container)' }}>
                 <CheckCircle size={20} />
               </div>
               <div>
@@ -89,7 +89,7 @@ export default function Profile() {
             </div>
             
             <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px' }}>
-              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: '#fef3c7', color: '#b45309' }}>
+              <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'var(--warning-container)', color: 'var(--on-warning-container)' }}>
                 <Clock size={20} />
               </div>
               <div>

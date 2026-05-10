@@ -47,7 +47,7 @@ export default function StudentInternship() {
   const getStatusBadge = (status) => {
     switch(status?.toLowerCase()) {
       case 'active': return <span className="badge success">{t('status.active')}</span>;
-      case 'completed': return <span className="badge" style={{ backgroundColor: '#dbeafe', color: '#1e40af' }}>{t('status.completed')}</span>;
+      case 'completed': return <span className="badge" style={{ backgroundColor: 'var(--info-container)', color: 'var(--on-info-container)' }}>{t('status.completed')}</span>;
       case 'dropped': return <span className="badge error">{t('status.dropped')}</span>;
       default: return <span className="badge">{status || 'N/A'}</span>;
     }

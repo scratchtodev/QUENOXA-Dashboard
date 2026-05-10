@@ -54,22 +54,22 @@ export default function Members() {
               <h4 style={{ fontSize: '14px', color: 'var(--on-surface-variant)', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Task Workload</h4>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
                 
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px', backgroundColor: '#f3f4f6', borderRadius: '8px' }}>
-                  <ListTodo size={18} color="#4b5563" style={{ marginBottom: '8px' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px', backgroundColor: 'var(--surface-container)', borderRadius: '8px' }}>
+                  <ListTodo size={18} color="var(--on-surface-variant)" style={{ marginBottom: '8px' }} />
                   <span style={{ fontSize: '20px', fontWeight: 'bold' }}>{member.tasks.total}</span>
                   <span style={{ fontSize: '12px', color: 'var(--on-surface-variant)' }}>Total</span>
                 </div>
                 
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px', backgroundColor: '#dcfce7', borderRadius: '8px' }}>
-                  <CheckCircle size={18} color="#166534" style={{ marginBottom: '8px' }} />
-                  <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#166534' }}>{member.tasks.completed}</span>
-                  <span style={{ fontSize: '12px', color: '#166534' }}>Completed</span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px', backgroundColor: 'var(--secondary-container)', borderRadius: '8px' }}>
+                  <CheckCircle size={18} color="var(--secondary)" style={{ marginBottom: '8px' }} />
+                  <span style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--secondary)' }}>{member.tasks.completed}</span>
+                  <span style={{ fontSize: '12px', color: 'var(--secondary)' }}>Completed</span>
                 </div>
                 
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px', backgroundColor: '#fef3c7', borderRadius: '8px' }}>
-                  <Clock size={18} color="#b45309" style={{ marginBottom: '8px' }} />
-                  <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#b45309' }}>{member.tasks.remaining}</span>
-                  <span style={{ fontSize: '12px', color: '#b45309' }}>Remaining</span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px', backgroundColor: 'var(--warning-container)', borderRadius: '8px' }}>
+                  <Clock size={18} color="var(--warning)" style={{ marginBottom: '8px' }} />
+                  <span style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--warning)' }}>{member.tasks.remaining}</span>
+                  <span style={{ fontSize: '12px', color: 'var(--warning)' }}>Remaining</span>
                 </div>
 
               </div>

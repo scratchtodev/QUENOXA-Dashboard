@@ -51,7 +51,7 @@ export default function Register() {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: 'var(--surface)', width: '100vw' }}>
         <div className="card" style={{ maxWidth: '450px', width: '100%', padding: '40px', textAlign: 'center', boxShadow: '0 20px 40px rgba(0,0,0,0.08)' }}>
-          <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px auto' }}>
+          <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: 'var(--secondary-container)', color: 'var(--on-secondary-container)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px auto' }}>
             <Mail size={32} />
           </div>
           <h2 style={{ marginBottom: '16px' }}>Verify Your Email</h2>
@@ -83,7 +83,7 @@ export default function Register() {
         </div>
 
         {error && (
-          <div style={{ backgroundColor: '#fee2e2', color: '#b91c1c', padding: '12px', borderRadius: '8px', marginBottom: '20px', fontSize: '14px' }}>
+          <div style={{ backgroundColor: 'var(--error-container)', color: 'var(--on-error-container)', padding: '12px', borderRadius: '8px', marginBottom: '20px', fontSize: '14px' }}>
             {error}
           </div>
         )}

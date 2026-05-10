@@ -138,7 +138,7 @@ export default function ClientProjects() {
                 <td style={{ fontWeight: '500' }}>{project.name}</td>
                 <td>{project.domain || 'N/A'}</td>
                 <td>
-                  <span className={`badge ${(project.status || '').toLowerCase() === 'active' || (project.status || '').toLowerCase() === 'ongoing' ? 'success' : (project.status || '').toLowerCase() === 'completed' ? '' : 'pending'}`} style={(project.status || '').toLowerCase() === 'completed' ? { backgroundColor: '#dbeafe', color: '#1e40af' } : {}}>
+                  <span className={`badge ${(project.status || '').toLowerCase() === 'active' || (project.status || '').toLowerCase() === 'ongoing' ? 'success' : (project.status || '').toLowerCase() === 'completed' ? '' : 'pending'}`} style={(project.status || '').toLowerCase() === 'completed' ? { backgroundColor: 'var(--info-container)', color: 'var(--on-info-container)' } : {}}>
                     {project.status || 'Pending'}
                   </span>
                 </td>
